@@ -1,7 +1,3 @@
-<Files ~ "^.*\.([Hh][Tt][Aa])">
-    order allow,deny
-    deny from all
-    satisfy all
-</Files>
-
-Options All -Indexes
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule . index.php [L]
