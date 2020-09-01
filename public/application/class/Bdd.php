@@ -2,6 +2,12 @@
 namespace classified_ads;
 use PDO,PDOException;
 
+/**
+ * Class gérant la connexion à la base de données
+ * Permet aussi d'éxécuter une requete SQL
+ * 
+ * @author Paturot A. <adrienpaturot@yahoo.fr>
+ */
 class Bdd extends PDO {
 
     const NAME ='classified_ads';
@@ -36,7 +42,7 @@ class Bdd extends PDO {
      * @return $sth - handler de la requete
      */
     static function executeSql($query,$array,$type) {
-        $co = Bdd::connect();		
+        $co = SELF::connect();		
         $sth = $co->prepare($query);
         foreach($array as $key => &$val){
             $sth->bindParam($key,$val,$type[$key]);
