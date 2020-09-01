@@ -22,11 +22,11 @@ class Crypt {
         $options = 0;
         $ivlen = openssl_cipher_iv_length(self::$cipher);
 
-        $characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@+^$";
+        $characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $iv = "";
 
         for($i=0;$i<$ivlen;$i++) {
-            $iv .= $characters[random_int(0,66)];
+            $iv .= $characters[random_int(0,61)];
         }
         $cipher_text = openssl_encrypt($string,self::$cipher,self::$encryption_key,$options,$iv);
 
