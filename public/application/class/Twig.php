@@ -3,21 +3,18 @@
 namespace classified_ads;
 
 /**
- * Undocumented class
+ * Class Twig permettant de charger un template
+ * 
+ * @author Paturot A. <adrienpaturot@yahoo.fr>
  */
 class Twig {
 
-    /**
-     * Undocumented variable
-     *
-     * @var [type]
-     */
     public $_template;
 
     /**
-     * Undocumented function
+     * Constructeur de classe
      *
-     * @param [type] $name
+     * @param [String] $name - nom du template
      */
     public function __construct($name){
         $loader = new \Twig\Loader\FilesystemLoader('application/template');
