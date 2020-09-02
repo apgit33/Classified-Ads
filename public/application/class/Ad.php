@@ -25,6 +25,7 @@ class Ad {
     {
         $this->dateCreate = date('Y-m-d');
     }
+    
     /**
      * Fonction statique qui récupère toutes les annonces validées pour les afficher
      *
@@ -87,24 +88,47 @@ class Ad {
     /**
      * Fonction statique de suppression d'annonce
      *
-     * @param [Object Annonce] $ad - annonce à supprimer
+     * @param [String] $slug - annonce à supprimer
      * @return void
      */
-    static function delete($ad){
+    static function delete($slug){
+
         $query= "DELETE FROM ca_ad WHERE a_unique_id = :uniqueId";
-        \classified_ads\Bdd::executeSql($query,[':uniqueId'=>$ad->uniqueId],[':uniqueId'=>PDO::PARAM_STR]);
+
+        \classified_ads\Bdd::executeSql($query,[':uniqueId'=>hash('sha1',$slug)],[':uniqueId'=>PDO::PARAM_STR]);
+
     }
 
     /**
      * Fonction statique de validation d'une annonce
+     * avec envoi de mail
      *
-     * @param [String] $id
+     * @param [String] $slug - annonce à valider
      * @return void
      */
-    static function validate($id) {
-        $query = "UPDATE ca_ad SET a_validate = true, a_date_validate = :date WHERE a_unique_id = :uniqueId";
+    static function validate($slug) {
 
-        \classified_ads\Bdd::executeSql($query,[':uniqueId'=>$id,':date'=>date("Y-m-d")],[':uniqueId'=>PDO::PARAM_STR,':date'=>PDO::PARAM_STR]);
+        $mail = \classified_ads\Crypt::decryptSimple(explode('&',$slug)[0]);
+        $id = \classified_ads\Crypt::decryptSimple(explode('&',$slug)[1]);
+
+        $mail_crypt = \classified_ads\Crypt::encryptSimple($mail);
+        $id_crypt = \classified_ads\Crypt::encryptSimple($id);
+
+        $new = hash('sha1',"$mail_crypt&$id_crypt");
+
+        $query = "UPDATE ca_ad INNER JOIN ca_user ON ca_ad.a_u_id = ca_user.u_id SET a_validate = :validate, a_date_validate = :date, a_unique_id = :newUnique WHERE a_unique_id = :uniqueId AND u_mail = :mail AND a_id = :id ";
+
+        $param = [':validate'=>true,':date'=>date('Y-m-d'),':newUnique'=>$new,':uniqueId'=>hash('sha1',$slug),':mail'=>$mail,':id'=>$id];
+
+        $type = [':validate'=>PDO::PARAM_BOOL,':date'=>PDO::PARAM_STR,':newUnique'=>PDO::PARAM_STR,':uniqueId'=>PDO::PARAM_STR,':mail'=>PDO::PARAM_STR,':id'=>PDO::PARAM_INT];
+
+        \classified_ads\Bdd::executeSql($query,$param,$type);
+
+        \classified_ads\Ad::updateId(hash('sha1',$slug),$new);
+        $message = "$mail_crypt\n$id_crypt ----------- <a href = '".SERVER_URI."/delete-$mail_crypt&$id_crypt>suppression </a>\n edition: <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>edition</a>";
+
+        mail($mail,"Validation de votre annonce",$message);
+
     }
 
     /**
