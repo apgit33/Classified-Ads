@@ -9,6 +9,8 @@ use \Respect\Validation\Validator as v;
 
 $erreur = [];
 $new_category="";
+$extensionUpload_image = "";
+
 $user = new \classified_ads\User();
 $ad = new \classified_ads\Ad();
 
@@ -36,6 +38,8 @@ if(v::key('last_name')->validate($_POST) && v::alpha('-')->validate($_POST['last
 //check phone
 if(v::key('phone')->validate($_POST) && v::phone()->validate($_POST['phone'])) {
     $user->phone = $_POST['phone'];
+} else {
+    $erreur['phone'] = "Invalid phone number";
 }
 
 //check price
@@ -50,16 +54,18 @@ if(v::key('price')->validate($_POST) && v::notEmpty()->validate($_POST['price'])
 //check category
 if(v::key('category')->validate($_POST) && v::digit()->validate($_POST['category'])){
     $ad->catId = $_POST['category'];
-    if (v::key('new_category')->validate($_POST) && v::alpha()->validate($_POST['new_category'])) {
-        //on check la nouvelle catégory dans la bdd
-        $query = "SELECT c_id FROM ca_category WHERE c_name = :cname";
-        $data = \classified_ads\Bdd::executeSql($query,[':cname'=>$_POST['new_category']],[':cname'=>PDO::PARAM_STR]);
-        if($data->fetch(PDO::FETCH_ASSOC)){
-            $erreur['category'] = "Category already exist";
-        } else {
-            $new_category =  $_POST['new_category'];
-        }
-    }
+    // if (v::key('new_category')->validate($_POST) && v::alpha()->validate($_POST['new_category'])) {
+    //     //on check la nouvelle catégory dans la bdd
+    //     $query = "SELECT c_id FROM ca_category WHERE c_name = :cname";
+    //     $data = \classified_ads\Bdd::executeSql($query,[':cname'=>$_POST['new_category']],[':cname'=>PDO::PARAM_STR]);
+    //     if($data->fetch(PDO::FETCH_ASSOC)){
+    //         $erreur['category'] = "Category already exist";
+    //     } else {
+    //         $new_category =  $_POST['new_category'];
+    //     }
+    // }
+} else{
+    $erreur['category'] = "invalid category";
 }
 
 // //check image name
@@ -70,16 +76,16 @@ if(v::key('category')->validate($_POST) && v::digit()->validate($_POST['category
 // }
 
 //check image
-// if(v::key('image_url')->validate($_FILES) && v::notEmpty()->validate($_FILES['image_url']['name'])) {
-//     $extensions = array('jpg', 'jpeg', 'png');
-//     $extensionUpload_image = strtolower(substr(strrchr($_FILES['image_url']['name'], '.'), 1));
+if(v::key('img_url')->validate($_FILES) && v::notEmpty()->validate($_FILES['img_url']['name'])) {
+    $extensions = array('jpg', 'jpeg', 'png');
+    $extensionUpload_image = strtolower(substr(strrchr($_FILES['img_url']['name'], '.'), 1));
 
-//     if (!in_array($extensionUpload_image,$extensions)){
-//         $erreur['image'] = "Mauvaise extension de fichier";
-//     }
-// } else {
-//     $erreur['image'] = "Image non renseignée";
-// }
+    if (!in_array($extensionUpload_image,$extensions)){
+        $erreur['image'] = "Mauvaise extension de fichier";
+    }
+} else {
+    $ad->imgUrl = "default.jpg";
+}
 
 //check desc
 if(v::key('desc')->validate($_POST) && v::length(5,255)->validate($_POST['desc'])) {
@@ -90,7 +96,7 @@ if(v::key('desc')->validate($_POST) && v::length(5,255)->validate($_POST['desc']
 
 // //check captcha.
 // // your secret key
-// $secret = "6LdUlLQZAAAAAB5aOeFWThZVnwlN4YFesXbdKu4n";
+// $secret = "YourSecretKey";
 // // empty response
 // $response = null;
 // // check secret key 
@@ -118,24 +124,28 @@ if(empty($erreur)) {
     $user->checkUser();
     $ad->userId = $user->id;
 
-    //on insere la new_cat
-    if(v::notEmpty()->validate($new_category)) {
-        $query = "INSERT INTO ca_category (c_name) VALUES (:name)";
-        $co = \classified_ads\Bdd::connect();
-        $sth = $co->prepare($query);
-        $sth->bindParam(':name',$new_category,PDO::PARAM_STR);
-        $sth->execute();
-        $ad->catId = $co->lastInsertId();
+
+    // //on insere la new_cat
+    // if(v::notEmpty()->validate($new_category)) {
+    //     $query = "INSERT INTO ca_category (c_name) VALUES (:name)";
+    //     $co = \classified_ads\Bdd::connect();
+    //     $sth = $co->prepare($query);
+    //     $sth->bindParam(':name',$new_category,PDO::PARAM_STR);
+    //     $sth->execute();
+    //     $ad->catId = $co->lastInsertId();
+    // }
+
+    //on crée le repertoire de l'utilisateur s'il n'existe pas
+    if(!file_exists("assets/medias/$user->id")) {
+        mkdir("assets/medias/$user->id");
+    }
+    //on upload l'image
+    if(move_uploaded_file($_FILES['img_url']['tmp_name'], "assets/medias/$user->id/.$extensionUpload_image")){
+        $ad->imgUrl = "$user->id.$extensionUpload_image";
     }
 
-    //on upload l'image
-    // if(move_uploaded_file($_FILES['image_url']['tmp_name'], "C:/wamp64/www/annonce/public/application/asset/medias/$user->id.$extensionUpload_image")){
-    //     $ad->imgUrl = "$user->id.$extensionUpload_image";
-    // }
-    $ad->imgUrl="$user->id.jpg";
-
     //on crée l'id unique
-    $mail_crypt = urlencode(\classified_ads\Crypt::encryptSimple($user->mail));
+    $mail_crypt = \classified_ads\Crypt::encryptSimple($user->mail);
     
     // $ad->uniqueId = urlencode(\classified_ads\Crypt::encryptSimple("mail=$user->mail"));
     $ad->uniqueId = "TOTO";
@@ -146,7 +156,7 @@ if(empty($erreur)) {
     //ajout l'annonce dans la bdd
     \classified_ads\Ad::add($ad);
 
-    $id_crypt = urlencode(\classified_ads\Crypt::encryptSimple(\classified_ads\Ad::getId($ad->uniqueId)));
+    $id_crypt = \classified_ads\Crypt::encryptSimple(\classified_ads\Ad::getId($ad->uniqueId));
     
     \classified_ads\Ad::updateId($ad->uniqueId,hash('sha1',"$mail_crypt&$id_crypt"));
 
@@ -154,16 +164,16 @@ if(empty($erreur)) {
     
 
     //envoi mail de confirmation
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
-    $headers .= "From: eze <dede@dede.fr>\r\nReply-to :dsd <dsds@fko.fr>\nX-Mailer:PHP";
+    $headers[] = 'MIME-Version: 1.0';
+    $headers[] = 'Content-type: text/html; charset=iso-8859-1';
+    // $headers .= "From: eze <dede@dede.fr>\r\nReply-to :dsd <dsds@fko.fr>\nX-Mailer:PHP";
 
     $sujet = "Validation de votre annonce";
     $message = "<a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>validation</a>\n edition: <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>validation</a>";
-    mail($user->mail, $sujet,$message);
-    var_dump(mail($user->mail, $sujet,$message));
+    
+    var_dump(mail($user->mail, $sujet,$message,implode("\r\n", $headers)));
+
+
 }
 
-
-var_dump($erreur);
 // echo json_encode(array('validation' => $validation,'erreurs' => $erreurs));
