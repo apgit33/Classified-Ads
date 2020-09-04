@@ -32,8 +32,9 @@ class Ad {
      * @return tableau contenant les enregistrements
      */
     static function viewAll(){
-        
-        $query = "SELECT `a_desc`,`a_image_url`,`a_unique_id`,`a_date_create`,`a_date_validate`, `ca_category`.`c_name` FROM `ca_ad` LEFT JOIN `ca_category` on `ca_category`.`c_id` = `a_c_id` WHERE `a_validate` = true";
+        $limit = 0;
+        $nombre = 10; //à voir plus tard
+        $query = "SELECT `a_desc`,`a_image_url`,`a_unique_id`,`a_date_create`,`a_date_validate`, `ca_category`.`c_name` FROM `ca_ad` LEFT JOIN `ca_category` on `ca_category`.`c_id` = `a_c_id` WHERE `a_validate` = true LIMIT $limit,$nombre";
         
         return (\classified_ads\Bdd::executeSql($query,[],[]))->fetchALL(PDO::FETCH_ASSOC);
     }
@@ -67,7 +68,6 @@ class Ad {
         $type=[':desc'=>PDO::PARAM_STR,':imgUrl'=>PDO::PARAM_STR,':uniqueId'=>PDO::PARAM_STR,':date'=>PDO::PARAM_STR,':catId'=>PDO::PARAM_STR,':uId'=>PDO::PARAM_STR];
         
         \classified_ads\Bdd::executeSql($query,$param,$type);
-
     }
 
     /**
@@ -104,8 +104,6 @@ class Ad {
         }else{
             return false;
         }
-        
-
     }
 
     /**
@@ -137,10 +135,10 @@ class Ad {
             $type = [':validate'=>PDO::PARAM_BOOL,':date'=>PDO::PARAM_STR,':newUnique'=>PDO::PARAM_STR,':uniqueId'=>PDO::PARAM_STR,':mail'=>PDO::PARAM_STR,':id'=>PDO::PARAM_INT];
             
             \classified_ads\Bdd::executeSql($query,$param,$type)->fetch();
-                // \classified_ads\Ad::updateId(hash('sha1',$slug),$new);
-            $message = "$mail_crypt\n$id_crypt ----------- <a href = '".SERVER_URI."/delete-$mail_crypt&$id_crypt>suppression </a>\n edition: <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>edition</a>";
+
+            $message = "$mail_crypt\n$id_crypt ----------- <a href = '".SERVER_URI."/delete-$mail_crypt&$id_crypt'>suppression </a>\n edition: <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>edition</a>";
     
-            mail($mail,"Validation de votre annonce",$message);
+            \classified_ads\Mail::mailTo($mail,"Validation de votre annonce",$message);
 
             return true;
         }else{
@@ -173,8 +171,8 @@ class Ad {
         \classified_ads\Bdd::executeSql($query,$param,$type);
     }
 
-    static function abricot($slug){
 
+    static function kebab($slug){
         $query = "SELECT * FROM ca_ad INNER JOIN ca_user ON a_u_id = u_id WHERE a_unique_id = :id";
         return \classified_ads\Bdd::executeSql($query,[':id'=>hash('sha1',$slug)],[':id'=>PDO::PARAM_STR])->fetchALL(PDO::FETCH_ASSOC);
     }
