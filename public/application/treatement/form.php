@@ -124,17 +124,6 @@ if(empty($erreur)) {
     $user->checkUser();
     $ad->userId = $user->id;
 
-
-    // //on insere la new_cat
-    // if(v::notEmpty()->validate($new_category)) {
-    //     $query = "INSERT INTO ca_category (c_name) VALUES (:name)";
-    //     $co = \classified_ads\Bdd::connect();
-    //     $sth = $co->prepare($query);
-    //     $sth->bindParam(':name',$new_category,PDO::PARAM_STR);
-    //     $sth->execute();
-    //     $ad->catId = $co->lastInsertId();
-    // }
-
     //on crée le repertoire de l'utilisateur s'il n'existe pas
     if(!file_exists("assets/medias/$user->id")) {
         mkdir("assets/medias/$user->id");
@@ -147,11 +136,7 @@ if(empty($erreur)) {
     //on crée l'id unique
     $mail_crypt = \classified_ads\Crypt::encryptSimple($user->mail);
     
-    // $ad->uniqueId = urlencode(\classified_ads\Crypt::encryptSimple("mail=$user->mail"));
     $ad->uniqueId = "TOTO";
-    // var_dump(\classified_ads\Crypt::decryptSimple(urldecode($ad->uniqueId)));
-    // var_dump($ad->uniqueId = urlencode(\classified_ads\Crypt::encryptSimple("mail=$user->mail"));
-
 
     //ajout l'annonce dans la bdd
     \classified_ads\Ad::add($ad);
@@ -164,14 +149,11 @@ if(empty($erreur)) {
     
 
     //envoi mail de confirmation
-    $headers[] = 'MIME-Version: 1.0';
-    $headers[] = 'Content-type: text/html; charset=iso-8859-1';
-    // $headers .= "From: eze <dede@dede.fr>\r\nReply-to :dsd <dsds@fko.fr>\nX-Mailer:PHP";
-
     $sujet = "Validation de votre annonce";
-    $message = "<a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>validation</a>\n edition: <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>validation</a>";
+    $message = "<a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>validation</a>\n edition: <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>edition</a>";
     
-    var_dump(mail($user->mail, $sujet,$message,implode("\r\n", $headers)));
+    var_dump(\classified_ads\Mail::mailTo($user->mail,$sujet,$message));
+    // var_dump(mail($user->mail, $sujet,$message,implode("\r\n", $headers)));
 
 
 }
