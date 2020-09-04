@@ -47,11 +47,12 @@ $router->map('GET','/add_ad', function() {
 $router->map('GET','/edit-[*:slug]',function($slug) {
     $twig = new \classified_ads\Twig('form.html.twig');
 
-    $datas = \classified_ads\Ad::abricot(hash('sha1',$slug));
+    $datas = \classified_ads\Ad::kebab($slug);
     echo $twig->_template->render([
         'datas'=> $datas,
         'SERVER_URI'=> SERVER_URI
     ]);
+    // require "application/treatement/form.php";
 });
 
 //route form handler
@@ -70,7 +71,7 @@ $router->map('GET','/confirm-[*:slug]',function($slug){
 
 });
 
-//route confirmation annonce
+//route suppression annonce
 $router->map('GET','/delete-[*:slug]',function($slug){
     if(\classified_ads\Ad::delete($slug)){
         echo "deleted";
@@ -81,11 +82,10 @@ $router->map('GET','/delete-[*:slug]',function($slug){
 });
 
 // //route confirmation annonce
-// $router->map('GET','/test',function(){
-//     $query= "SELECT a_id FROM ca_ad WHERE a_unique_id = :uniqueId";
-//      \classified_ads\Bdd::executeSql($query,[':uniqueId'=>"9972cf7edcd0a1f9637db2a7e451fa76d485b93b"],[':uniqueId'=>PDO::PARAM_STR]);
-//     var_dump(\classified_ads\Bdd::executeSql($query,[':uniqueId'=>"9972cf7edcd0a1f9637db2a7e451fa76d485b93b"],[':uniqueId'=>PDO::PARAM_STR]);
-// });
+$router->map('GET','/test',function(){
+    // echo "test";
+    require "application/template/home.php";
+});
 
 $match = $router->match();
 
