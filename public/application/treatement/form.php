@@ -8,9 +8,10 @@
 use \Respect\Validation\Validator as v;
 $start = $_SERVER['REQUEST_URI'];
 $explode_start = explode('-',$start);
+$upload = false;
 
 if(!empty($explode_start[1])){
-    $start = \classified_ads\Ad::kebab($explode_start[1]);
+    $start = \classified_ads\Ad::getAd($explode_start[1]);
 }
 
 if ($start == '/add_form' || !empty($start)) {
@@ -50,6 +51,10 @@ if ($start == '/add_form' || !empty($start)) {
         $erreur['phone'] = "Invalid phone number";
     }
     
+    if(!\classified_ads\User::checkUser($user)) {
+        $erreur['user'] = "Wrong user";
+    }
+    // $erreur['test'] = "test";
     //check price
     $ad->price = "";
     
@@ -97,6 +102,8 @@ if ($start == '/add_form' || !empty($start)) {
     
         if (!in_array($extensionUpload_image,$extensions)){
             $erreur['image'] = "Mauvaise extension de fichier";
+        }else{
+            $upload = true;
         }
     }else if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/edit"){
         $ad->imgUrl = \classified_ads\Ad::getAd(explode('-',$_SERVER['REQUEST_URI'])[1])['a_img_url'];
@@ -134,21 +141,24 @@ if ($start == '/add_form' || !empty($start)) {
     /** 
      * Fin des tests
      */
-    // var_dump($erreur);
+    var_dump($erreur);
     if(empty($erreur)) {
-        $user->checkUser();
+        $user->getUserId();
         $ad->userId = $user->id;
               
         //on crée le repertoire de l'utilisateur s'il n'existe pas
         if(!file_exists("assets/medias/$user->id")) {
             mkdir("assets/medias/$user->id");
         }
-        if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/add_form"){
+        
+        if($upload) {
             //on upload l'image
-            if(move_uploaded_file($_FILES['img_url']['tmp_name'], "assets/medias/$user->id/.$extensionUpload_image")){
-                $ad->imgUrl = "$user->id.$extensionUpload_image";
-            }
-    
+            move_uploaded_file($_FILES['img_url']['tmp_name'], "assets/medias/$user->id/.$extensionUpload_image");
+            $ad->imgUrl = "$user->id.$extensionUpload_image";
+        }
+
+        if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/add_form"){
+
             //on crée l'id unique
             $mail_crypt = \classified_ads\Crypt::encryptSimple($user->mail);
             
@@ -156,15 +166,18 @@ if ($start == '/add_form' || !empty($start)) {
     
             //ajout l'annonce dans la bdd
             \classified_ads\Ad::add($ad);
+
+            //on crée le fichier pdf de l'annonce
+            
     
             $id_crypt = \classified_ads\Crypt::encryptSimple(\classified_ads\Ad::getId($ad->uniqueId));
             
             \classified_ads\Ad::updateId($ad->uniqueId,hash('sha1',"$mail_crypt&$id_crypt"));
     
             //envoi mail de confirmation
-            $sujet = "Validation of your Ad : $ad->title";
-            $message .= "To validate your new Ad, click on the link below <br>
-            <a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>Validation</a><br>
+            $sujet = "Confirm your Ad : $ad->title";
+            $message = "To confirm your new ad, click on the link below <br>
+            <a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>Confirmation</a><br>
             You can still edit your ad before post it by clicking on this link <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>Edit</a>";
             
             \classified_ads\Mail::mailTo($user,$sujet,$message);
