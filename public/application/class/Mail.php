@@ -19,7 +19,7 @@ class Mail {
     static function mailTo($user,$sujet,$message){
 
         // Create the Transport
-        $transport = (new \Swift_SmtpTransport('smtp.mail.yahoo.com', 465,'ssl'))
+        $transport = (new \Swift_SmtpTransport('smtp.exemple', 'port','type_connection'))
         ->setUsername('Username')
         ->setPassword('Password')
         ;      
