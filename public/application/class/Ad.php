@@ -172,7 +172,7 @@ class Ad {
     }
 
 
-    static function kebab($slug){
+    static function abricot($slug){
         $query = "SELECT * FROM ca_ad INNER JOIN ca_user ON a_u_id = u_id WHERE a_unique_id = :id";
         return \classified_ads\Bdd::executeSql($query,[':id'=>hash('sha1',$slug)],[':id'=>PDO::PARAM_STR])->fetchALL(PDO::FETCH_ASSOC);
     }
