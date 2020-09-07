@@ -12,10 +12,10 @@ $router->map('GET','/', function() {
     
     $twig = new \classified_ads\Twig('index.html.twig');
 
-    $datas = \classified_ads\Ad::viewAll();
+    $ads = \classified_ads\Ad::viewAll();
 
     echo $twig->_template->render([
-        'liste_annonce' => $datas,
+        'list_ads' => $ads,
         'SERVER_URI'=> SERVER_URI
     ]);
 });
@@ -25,10 +25,10 @@ $router->map('GET','/view-[i:id]', function($id) {
 
     $twig = new \classified_ads\Twig('view.html.twig');
 
-    $datas = \classified_ads\Ad::view($id);
+    $ad = \classified_ads\Ad::view($id);
 
     echo $twig->_template->render([
-        '' => $datas,
+        'ad' => $ad,
         'SERVER_URI'=> SERVER_URI
     ]);
 });
@@ -36,9 +36,11 @@ $router->map('GET','/view-[i:id]', function($id) {
 //route d'ajout annonce
 $router->map('GET','/add_ad', function() {
     $twig = new \classified_ads\Twig('form.html.twig');
+    $categoies = \classified_ads\Category::getAll();
 
     echo $twig->_template->render([
         'titre' => "Ajouter une annonce",
+        'list_category'=> $categoies,
         'SERVER_URI'=> SERVER_URI
     ]);
 });
@@ -46,10 +48,12 @@ $router->map('GET','/add_ad', function() {
 //route d'edition d'une annonce
 $router->map('GET','/edit-[*:slug]',function($slug) {
     $twig = new \classified_ads\Twig('form.html.twig');
+    $categoies = \classified_ads\Category::getAll();
 
-    $datas = \classified_ads\Ad::abricot($slug);
+    $ads = \classified_ads\Ad::getAd($slug);
     echo $twig->_template->render([
-        'datas'=> $datas,
+        'list_ads'=> $ads,
+        'list_category'=> $categoies,
         'SERVER_URI'=> SERVER_URI
     ]);
     // require "application/treatement/form.php";
