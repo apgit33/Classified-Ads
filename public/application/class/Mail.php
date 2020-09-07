@@ -16,23 +16,25 @@ class Mail {
      * @param [String] $message - Message du mail
      * @return void
      */
-    static function mailTo($mail,$sujet,$message){
+    static function mailTo($user,$sujet,$message){
 
         // Create the Transport
         $transport = (new \Swift_SmtpTransport('smtp.mail.yahoo.com', 465,'ssl'))
-        ->setUsername('adrienpaturot')
-        ->setPassword('Avbelbob33')
+        ->setUsername('Username')
+        ->setPassword('Password')
         ;      
 
         // Create the Mailer using your created Transport
         $mailer = new \Swift_Mailer($transport);
 
+        $body = "Hello $user->firstName $user->lastName,<br><br>";
+        $body .= $message;
         // Create a message
         $message = (new \Swift_Message($sujet))
         ->setContentType("text/html")
-        ->setFrom(["adrienpaturot@yahoo.fr" => 'John Doe']) //à voir plus tard
-        ->setTo([$mail => 'Adrien Paturot'])
-        ->setBody($message)
+        ->setFrom(["adrienpaturot@yahoo.fr" => 'Adrien Paturot']) //à voir plus tard
+        ->setTo([$user->mail => "$user->firstName $user->lastName"])
+        ->setBody($body)
         ;
 
         // Send the message
