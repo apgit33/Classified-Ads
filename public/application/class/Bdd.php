@@ -8,7 +8,7 @@ use PDO,PDOException;
  * 
  * @author Paturot A. <adrienpaturot@yahoo.fr>
  */
-class Bdd extends PDO {
+class Bdd {
 
     const NAME ='classified_ads';
     const HOST = 'localhost';
