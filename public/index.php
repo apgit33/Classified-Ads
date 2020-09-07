@@ -47,7 +47,7 @@ $router->map('GET','/add_ad', function() {
 $router->map('GET','/edit-[*:slug]',function($slug) {
     $twig = new \classified_ads\Twig('form.html.twig');
 
-    $datas = \classified_ads\Ad::kebab($slug);
+    $datas = \classified_ads\Ad::abricot($slug);
     echo $twig->_template->render([
         'datas'=> $datas,
         'SERVER_URI'=> SERVER_URI
