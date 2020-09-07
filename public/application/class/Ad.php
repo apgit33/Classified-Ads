@@ -128,6 +128,9 @@ class Ad {
 
         $mail = \classified_ads\Crypt::decryptSimple(explode('&',$slug)[0]);
         $id = \classified_ads\Crypt::decryptSimple(explode('&',$slug)[1]);
+        $user = new User();
+        $user->setUser($mail);
+        $title = \classified_ads\Ad::getAdTitle($slug);
 
         $query = "SELECT a_id FROM ca_ad INNER JOIN ca_user ON ca_ad.a_u_id = ca_user.u_id WHERE a_unique_id = :id AND u_mail = :mail ";
         $response = \classified_ads\Bdd::executeSql($query,[':id'=>hash('sha1',$slug),':mail'=>$mail],[':id'=>PDO::PARAM_INT,':mail'=>PDO::PARAM_STR]);
@@ -147,9 +150,9 @@ class Ad {
             
             \classified_ads\Bdd::executeSql($query,$param,$type)->fetch();
 
-            $message = "$mail_crypt\n$id_crypt ----------- <a href = '".SERVER_URI."/delete-$mail_crypt&$id_crypt'>suppression </a>\n edition: <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>edition</a>";
+            $message = "To delete your ad, click on this link <a href = '".SERVER_URI."/delete-$mail_crypt&$id_crypt'>DELETE </a>";
     
-            \classified_ads\Mail::mailTo($mail,"Validation de votre annonce",$message);
+            \classified_ads\Mail::mailTo($user,"Congratulation ! Your ad $title is now validate",$message);
 
             return true;
         }else{
@@ -188,5 +191,13 @@ class Ad {
     static function getAd($slug){
         $query = "SELECT * FROM ca_ad INNER JOIN ca_user ON a_u_id = u_id WHERE a_unique_id = :id";
         return \classified_ads\Bdd::executeSql($query,[':id'=>hash('sha1',$slug)],[':id'=>PDO::PARAM_STR])->fetchALL(PDO::FETCH_ASSOC);
+    }
+
+    static function getAdTitle($slug){
+        $query = "SELECT a_title FROM ca_ad WHERE a_unique_id = :id";
+        $reponse = \classified_ads\Bdd::executeSql($query,[':id'=>hash('sha1',$slug)],[':id'=>PDO::PARAM_STR]);
+        $data = $reponse->fetch(PDO::FETCH_ASSOC);
+        
+        return $data['a_title'];
     }
 }
