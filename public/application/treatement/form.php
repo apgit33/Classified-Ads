@@ -83,6 +83,13 @@ if ($start == '/add_form' || !empty($start)) {
     //     $erreur['img_name'] = "Name incorrect";
     // }
     
+    //check title
+    if(v::key('title')->validate($_POST) && v::alpha(' ')->validate($_POST['title'])) {
+        $ad->title = $_POST['title'];
+    } else {
+        $erreur['title'] = "Title incorrect";
+    }
+
     //check image
     if(v::key('img_url')->validate($_FILES) && v::notEmpty()->validate($_FILES['img_url']['name'])) {
         $extensions = array('jpg', 'jpeg', 'png');
@@ -92,15 +99,14 @@ if ($start == '/add_form' || !empty($start)) {
             $erreur['image'] = "Mauvaise extension de fichier";
         }
     }else if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/edit"){
-    
-        $ad->imgUrl = \classified_ads\Ad::kebab(explode('-',$_SERVER['REQUEST_URI'])[1])['a_img_url'];
+        $ad->imgUrl = \classified_ads\Ad::getAd(explode('-',$_SERVER['REQUEST_URI'])[1])['a_img_url'];
     }else{
         $ad->imgUrl = "default.jpg";
     }
     
     //check desc
     if(v::key('desc')->validate($_POST) && v::length(5,255)->validate($_POST['desc'])) {
-        $ad->desc = $_POST['desc'];
+        $ad->description = $_POST['desc'];
     } else {
         $erreur['desc'] = "Enter a valid desc";
     }
@@ -122,13 +128,13 @@ if ($start == '/add_form' || !empty($start)) {
     // }
     
     // if ($response == null || ($response->success==false)) {
-    //     $erreurs['captcha'] = 'Merci de cocher le captcha';
+    //     $erreur['captcha'] = 'Merci de cocher le captcha';
     // }
     
     /** 
      * Fin des tests
      */
-    
+    // var_dump($erreur);
     if(empty($erreur)) {
         $user->checkUser();
         $ad->userId = $user->id;
@@ -146,7 +152,7 @@ if ($start == '/add_form' || !empty($start)) {
             //on crée l'id unique
             $mail_crypt = \classified_ads\Crypt::encryptSimple($user->mail);
             
-            $ad->uniqueId = "TOTO";
+            $ad->uniqueId = "defaultId";
     
             //ajout l'annonce dans la bdd
             \classified_ads\Ad::add($ad);
@@ -156,11 +162,13 @@ if ($start == '/add_form' || !empty($start)) {
             \classified_ads\Ad::updateId($ad->uniqueId,hash('sha1',"$mail_crypt&$id_crypt"));
     
             //envoi mail de confirmation
-            $sujet = "Validation de votre annonce";
-            $message = "<a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>validation</a>\n edition: <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>edition</a>";
+            $sujet = "Validation of your Ad : $ad->title";
+            $message .= "To validate your new Ad, click on the link below <br>
+            <a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>Validation</a><br>
+            You can still edit your ad before post it by clicking on this link <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>Edit</a>";
             
-            \classified_ads\Mail::mailTo($user->mail,$sujet,$message);
-            // var_dump(mail($user->mail, $sujet,$message,implode("\r\n", $headers)));
+            \classified_ads\Mail::mailTo($user,$sujet,$message);
+
         }else if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/edit"){
             \classified_ads\Ad::modify($ad);
         }
