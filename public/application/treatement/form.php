@@ -52,13 +52,16 @@ if ($start == '/add_form' || !empty($start)) {
     }
 
     //check price
-    $ad->price = "";
-    
-    if(v::key('price')->validate($_POST) && v::notEmpty()->validate($_POST['price']) && !(v::numericVal()->positive()->validate($_POST['price'])) ){
-        $erreur['price'] = "Enter a valid price";
-    } else {
-        $ad->price = $_POST['price'];
+    if(v::notempty()->validate($_POST['price'])){
+        if(v::key('price')->validate($_POST) && (v::numericVal()->positive()->validate($_POST['price'])) ){
+            $ad->price = $_POST['price'];
+        } else {
+            $erreur['price'] = "Enter a valid price";
+        } 
+    }else{
+        $ad->price = "";
     }
+    
     
     //check category
     if(v::key('category')->validate($_POST) && v::digit()->validate($_POST['category'])){
@@ -91,36 +94,35 @@ if ($start == '/add_form' || !empty($start)) {
     }
     
     //check desc
-    if(v::key('desc')->validate($_POST) && v::length(5,255)->validate($_POST['desc'])) {
+    if(v::key('desc')->validate($_POST) && v::notEmpty()->length(5,255)->validate($_POST['desc'])) {
         $ad->description = $_POST['desc'];
     } else {
         $erreur['desc'] = "Enter a valid desc";
     }
     
-    //check captcha.
-    // your secret key
-    $secret = "YourSecretKey";
-    // empty response
-    $response = null;
-    // check secret key 
-    $reCaptcha = new \classified_ads\ReCaptcha($secret);
+    // //check captcha.
+    // // your secret key
+    // $secret = "YourSecretKey";
+    // // empty response
+    // $response = null;
+    // // check secret key 
+    // $reCaptcha = new \classified_ads\ReCaptcha($secret);
     
-    // if submitted check response
-    if ($_POST["g-recaptcha-response"]) {
-        $response = $reCaptcha->verifyResponse(
-            $_SERVER["REMOTE_ADDR"],
-            $_POST["g-recaptcha-response"]
-        );
-    }
+    // // if submitted check response
+    // if ($_POST["g-recaptcha-response"]) {
+    //     $response = $reCaptcha->verifyResponse(
+    //         $_SERVER["REMOTE_ADDR"],
+    //         $_POST["g-recaptcha-response"]
+    //     );
+    // }
     
-    if ($response == null || ($response->success==false)) {
-        $erreur['captcha'] = 'Merci de cocher le captcha';
-    }
+    // if ($response == null || ($response->success==false)) {
+    //     $erreur['captcha'] = 'Merci de cocher le captcha';
+    // }
     
     /** 
      * Fin des tests
      */
-    var_dump($erreur);
     if(empty($erreur)) {
         $user->getUserId();
         $ad->userId = $user->id;
@@ -160,12 +162,17 @@ if ($start == '/add_form' || !empty($start)) {
             <a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>Confirmation</a><br>
             You can still edit your ad before post it by clicking on this link <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>Edit</a>";
             
-            \classified_ads\Mail::mailTo($user,$sujet,$message);
+            if(\classified_ads\Mail::mailTo($user,$sujet,$message)) {
+                $erreur['mail'] = "An email has been send";
+            }else{
+                $erreur['mail'] = "The email couldn't be send, an error occured";
+            }
 
         }else if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/edit"){
             \classified_ads\Ad::modify($ad);
         }
     }
+    json_encode($erreur);
 }else{
     header('Location: add_ad');
 }
