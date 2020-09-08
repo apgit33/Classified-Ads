@@ -1,11 +1,7 @@
 <?php
-// require dirname(dirname(__FILE__)). DIRECTORY_SEPARATOR . "vendor/autoload.php";
 
-// namespace classified_ads\treatement;
-
-// use classified_ads\Ad;
-// require_once "application/class/recaptchalib.php";
 use \Respect\Validation\Validator as v;
+
 $start = $_SERVER['REQUEST_URI'];
 $explode_start = explode('-',$start);
 $upload = false;
@@ -54,42 +50,25 @@ if ($start == '/add_form' || !empty($start)) {
     if(!\classified_ads\User::checkUser($user)) {
         $erreur['user'] = "Wrong user";
     }
-    // $erreur['test'] = "test";
+
     //check price
     $ad->price = "";
     
     if(v::key('price')->validate($_POST) && v::notEmpty()->validate($_POST['price']) && !(v::numericVal()->positive()->validate($_POST['price'])) ){
         $erreur['price'] = "Enter a valid price";
     } else {
-        // $ad->price = $_POST['price'];
+        $ad->price = $_POST['price'];
     }
     
     //check category
     if(v::key('category')->validate($_POST) && v::digit()->validate($_POST['category'])){
         $ad->catId = $_POST['category'];
-        // if (v::key('new_category')->validate($_POST) && v::alpha()->validate($_POST['new_category'])) {
-        //     //on check la nouvelle catégory dans la bdd
-        //     $query = "SELECT c_id FROM ca_category WHERE c_name = :cname";
-        //     $data = \classified_ads\Bdd::executeSql($query,[':cname'=>$_POST['new_category']],[':cname'=>PDO::PARAM_STR]);
-        //     if($data->fetch(PDO::FETCH_ASSOC)){
-        //         $erreur['category'] = "Category already exist";
-        //     } else {
-        //         $new_category =  $_POST['new_category'];
-        //     }
-        // }
     } else{
         $erreur['category'] = "invalid category";
     }
     
-    // //check image name
-    // if(v::key('img_name')->validate($_POST) && v::alpha(' ')->validate($_POST['img_name'])) {
-    //     $ad->imgName = $_POST['img_name'];
-    // } else {
-    //     $erreur['img_name'] = "Name incorrect";
-    // }
-    
     //check title
-    if(v::key('title')->validate($_POST) && v::alpha(' ')->validate($_POST['title'])) {
+    if(v::key('title')->validate($_POST) && v::notEmpty()->validate($_POST['title'])) {
         $ad->title = $_POST['title'];
     } else {
         $erreur['title'] = "Title incorrect";
@@ -108,7 +87,7 @@ if ($start == '/add_form' || !empty($start)) {
     }else if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/edit"){
         $ad->imgUrl = \classified_ads\Ad::getAd(explode('-',$_SERVER['REQUEST_URI'])[1])['a_img_url'];
     }else{
-        $ad->imgUrl = "default.jpg";
+        $ad->imgUrl = "assets/medias/default.jpg";
     }
     
     //check desc
@@ -118,25 +97,25 @@ if ($start == '/add_form' || !empty($start)) {
         $erreur['desc'] = "Enter a valid desc";
     }
     
-    // //check captcha.
-    // // your secret key
-    // $secret = "YourSecretKey";
-    // // empty response
-    // $response = null;
-    // // check secret key 
-    // $reCaptcha = new ReCaptcha($secret);
+    //check captcha.
+    // your secret key
+    $secret = "YourSecretKey";
+    // empty response
+    $response = null;
+    // check secret key 
+    $reCaptcha = new \classified_ads\ReCaptcha($secret);
     
-    // // if submitted check response
-    // if ($_POST["g-recaptcha-response"]) {
-    //     $response = $reCaptcha->verifyResponse(
-    //         $_SERVER["REMOTE_ADDR"],
-    //         $_POST["g-recaptcha-response"]
-    //     );
-    // }
+    // if submitted check response
+    if ($_POST["g-recaptcha-response"]) {
+        $response = $reCaptcha->verifyResponse(
+            $_SERVER["REMOTE_ADDR"],
+            $_POST["g-recaptcha-response"]
+        );
+    }
     
-    // if ($response == null || ($response->success==false)) {
-    //     $erreur['captcha'] = 'Merci de cocher le captcha';
-    // }
+    if ($response == null || ($response->success==false)) {
+        $erreur['captcha'] = 'Merci de cocher le captcha';
+    }
     
     /** 
      * Fin des tests
@@ -145,16 +124,17 @@ if ($start == '/add_form' || !empty($start)) {
     if(empty($erreur)) {
         $user->getUserId();
         $ad->userId = $user->id;
-              
+        $ad->setId();
+        
         //on crée le repertoire de l'utilisateur s'il n'existe pas
         if(!file_exists("assets/medias/$user->id")) {
             mkdir("assets/medias/$user->id");
         }
-        
+
+        //on upload l'image
         if($upload) {
-            //on upload l'image
-            move_uploaded_file($_FILES['img_url']['tmp_name'], "assets/medias/$user->id/.$extensionUpload_image");
-            $ad->imgUrl = "$user->id.$extensionUpload_image";
+            $ad->imgUrl = "assets/medias/$user->id/$ad->id.$extensionUpload_image";
+            move_uploaded_file($_FILES['img_url']['tmp_name'], $ad->imgUrl);
         }
 
         if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/add_form"){
@@ -163,13 +143,13 @@ if ($start == '/add_form' || !empty($start)) {
             $mail_crypt = \classified_ads\Crypt::encryptSimple($user->mail);
             
             $ad->uniqueId = "defaultId";
-    
+
+            //on crée le fichier pdf de l'annonce
+            $ad->makePdf();
+            
             //ajout l'annonce dans la bdd
             \classified_ads\Ad::add($ad);
 
-            //on crée le fichier pdf de l'annonce
-            
-    
             $id_crypt = \classified_ads\Crypt::encryptSimple(\classified_ads\Ad::getId($ad->uniqueId));
             
             \classified_ads\Ad::updateId($ad->uniqueId,hash('sha1',"$mail_crypt&$id_crypt"));
