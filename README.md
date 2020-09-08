@@ -67,4 +67,8 @@ Projet de petites annonces
 	
 ## Remarque
 + On ne veut pas de pattern MVC, on reste en programmation objet POO simple
-+ Pensez à crypter les accès de validation et modification	
++ Pensez à crypter les accès de validation et modification
+
+## Initialisation
++ Changer l'initialisation du Swift_SmtpTransport par celui de votre choix dans la class "Mail.php#22"
++ Faire de même pour la clef Captcha correspondant à celle de votre api google dans "treatement/form.php#102"
