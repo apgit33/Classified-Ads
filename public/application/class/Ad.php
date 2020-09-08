@@ -1,6 +1,7 @@
 <?php
 namespace classified_ads;
 use PDO;
+define('EURO',chr(128));
 
 /**
  * Class représentant une Annonce
@@ -9,8 +10,10 @@ use PDO;
  */
 class Ad {
 
+    public $id;
     public $title;
     public $description;
+    public $price;
     public $imgUrl;
     public $uniqueId;
     public $validate;
@@ -18,6 +21,7 @@ class Ad {
     public $dateValidate;
     public $catId;
     public $userId;
+    public $pdf;
 
     /**
      * Constructeur de class
@@ -64,19 +68,21 @@ class Ad {
      * @return void
      */
     static function add($ad){
-        $query = "INSERT INTO `ca_ad`(`a_title`,`a_desc`, `a_image_url`, `a_unique_id`, `a_date_create`, `a_c_id`, `a_u_id`) VALUES (:title,:desc,:url, :uniqueId, :date,:catId,:uId)";
+        $query = "INSERT INTO `ca_ad`(`a_title`,`a_desc`,`a_price`, `a_image_url`, `a_unique_id`, `a_date_create`, `a_c_id`, `a_u_id`,`a_pdf`) VALUES (:title,:desc,:price,:url, :uniqueId, :date,:catId,:uId,:pdf)";
 
         $param = [
             ':title'=>$ad->title,
             ':desc'=>$ad->description,
+            ':price'=>strval($ad->price),
             ':url'=>$ad->imgUrl,
             ':uniqueId'=>$ad->uniqueId,
             ':date'=>$ad->dateCreate,
             ':catId'=>$ad->catId,
-            ':uId'=>$ad->userId
+            ':uId'=>$ad->userId,
+            ':pdf'=>$ad->pdf
         ];
         
-        $type=[':title'=>PDO::PARAM_STR,':desc'=>PDO::PARAM_STR,':url'=>PDO::PARAM_STR,':uniqueId'=>PDO::PARAM_STR,':date'=>PDO::PARAM_STR,':catId'=>PDO::PARAM_STR,':uId'=>PDO::PARAM_STR];
+        $type=[':title'=>PDO::PARAM_STR,':desc'=>PDO::PARAM_STR,':price'=>PDO::PARAM_STR,':url'=>PDO::PARAM_STR,':uniqueId'=>PDO::PARAM_STR,':date'=>PDO::PARAM_STR,':catId'=>PDO::PARAM_STR,':uId'=>PDO::PARAM_STR,':pdf'=>PDO::PARAM_STR];
         
         \classified_ads\Bdd::executeSql($query,$param,$type);
     }
@@ -187,17 +193,60 @@ class Ad {
         \classified_ads\Bdd::executeSql($query,$param,$type);
     }
 
-
+    /**
+     * Fonction de récupération d'une annonce
+     *
+     * @param [String] $slug
+     * @return tableau de données
+     */
     static function getAd($slug){
         $query = "SELECT * FROM ca_ad INNER JOIN ca_user ON a_u_id = u_id WHERE a_unique_id = :id";
         return \classified_ads\Bdd::executeSql($query,[':id'=>hash('sha1',$slug)],[':id'=>PDO::PARAM_STR])->fetchALL(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Fonction de récupération du titre de l'annonce
+     *
+     * @param [String] $slug
+     * @return String
+     */
     static function getAdTitle($slug){
         $query = "SELECT a_title FROM ca_ad WHERE a_unique_id = :id";
         $reponse = \classified_ads\Bdd::executeSql($query,[':id'=>hash('sha1',$slug)],[':id'=>PDO::PARAM_STR]);
         $data = $reponse->fetch(PDO::FETCH_ASSOC);
         
         return $data['a_title'];
+    }
+
+    /**
+     * Fonction qui initialise l'id de l'annonce qui va être ajouter à la bdd
+     *
+     * @return void
+     */
+    public function setId(){
+        $query = "SELECT MAX(a_id) as maxId FROM ca_ad";
+        $reponse = \classified_ads\Bdd::executeSql($query,[],[]);
+        $data = $reponse->fetch(PDO::FETCH_ASSOC);
+        $this->id = $data['maxId']+1;
+    }
+
+    /**
+     * Fonction de création de l'annonce en pdf
+     *
+     * @return void
+     */
+    public function makePdf() {
+            $fpdf = new \classified_ads\FPDF();
+            $fpdf->AddPage();
+            $fpdf->SetFont('Arial','B',22);
+            $fpdf->Cell(0,10,utf8_decode($this->title),0,2,'C');
+            $fpdf->Image($this->imgUrl,(210-100)/2,null,100);
+            $fpdf->Ln();
+            $fpdf->SetFont('Arial');
+            $fpdf->Cell(40,10,"Date : ".$this->dateCreate,0,1);
+            $fpdf->Cell(40,10,"Price : ".$this->price." ".EURO,0,1);
+            $fpdf->Cell(40,10,"Description : ".utf8_decode($this->description));
+            $this->pdf = "assets/medias/".$this->userId."/".$this->id.".pdf";
+            $fpdf->Output("F",$this->pdf);
     }
 }
