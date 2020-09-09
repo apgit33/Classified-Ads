@@ -1,7 +1,7 @@
 <?php
 
 namespace classified_ads;
-
+// use Swift_Mailer;
 /**
  * Class Mail gérant l'envoi d'e-mail
  * @author Paturot A. <adrienpaturot@yahoo.fr>
@@ -23,6 +23,7 @@ class Mail {
         ->setUsername('Username')
         ->setPassword('Password')
         ;
+
 
         // Create the Mailer using your created Transport
         $mailer = new \Swift_Mailer($transport);

@@ -113,7 +113,7 @@ function __construct($orientation='P', $unit='mm', $size='A4')
 	elseif(is_dir(dirname(__FILE__).'/css/font/'))
 		$this->fontpath = dirname(__FILE__).'/css/font/';
 	else
-		$this->fontpath = getcwd().'/css/font/';
+		$this->fontpath = dirname(dirname(dirname(__FILE__))).'/public/css/font/';
 	// Core fonts
 	$this->CoreFonts = array('courier', 'helvetica', 'times', 'symbol', 'zapfdingbats');
 	// Scale factor

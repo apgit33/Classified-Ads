@@ -90,7 +90,7 @@ if ($start == '/add_form' || !empty($start)) {
     }else if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/edit"){
         $ad->imgUrl = \classified_ads\Ad::getAd(explode('-',$_SERVER['REQUEST_URI'])[1])['a_img_url'];
     }else{
-        $ad->imgUrl = "assets/medias/default.jpg";
+        $ad->imgUrl = "assets/medias/default.jpeg";
     }
     
     //check desc
@@ -172,7 +172,7 @@ if ($start == '/add_form' || !empty($start)) {
             \classified_ads\Ad::modify($ad);
         }
     }
-    json_encode($erreur);
+    // json_encode($erreur);
 }else{
     header('Location: add_ad');
 }

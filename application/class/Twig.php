@@ -17,8 +17,9 @@ class Twig {
      * @param [String] $name - nom du template
      */
     public function __construct($name){
-        $loader = new \Twig\Loader\FilesystemLoader('application/template');
+        $loader = new \Twig\Loader\FilesystemLoader(dirname(dirname(__FILE__)).'/template');
         $twig = new \Twig\Environment($loader, [
+            // 'cache' => (dirname(dirname(__FILE__)).'/cache'),
             'cache' => false,
         ]);
 

@@ -9,7 +9,7 @@
             <div class="container item-content">
                 <div class="row">
                     <div class="col-8">
-                        <img src="images/arold.jpeg" alt="arold" class="item-picture">
+                        <img src="assets/default.jpeg" alt="arold" class="item-picture">
                     </div>
                     <div class="col-4">
                         <p>Adresse mail</p>
@@ -28,11 +28,11 @@
             {% for ad in list_ads %}
             <div class="row section">
                 <div class="col-4">
-                    <img src="{{ ad.a_image_url }}" alt="arold" class="picture">
+                    <img src="{{ SERVER_URI }}/{{ ad.a_image_url }}" alt="arolds" class="picture">
                 </div>
                 <div class="col-6">
-                    <p>Nom </br>Prenom</p>
-                    <p>Catégorie </br>Prix</p>
+                    <p>{{ ad.a_title }}
+                    <p>{{ ad.c_name }} </br>Prix : {{ ad.a_price }} €</p>
                     <button type="button" id="button" value="">Plus d'informations</i></button>
                 </div>
                 <div class="col-2">

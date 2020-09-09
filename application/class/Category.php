@@ -15,7 +15,7 @@ class Category {
      */
     static function getAll() {
         $query = "SELECT c_name FROM ca_category";
-        $response = \classified_ads\Bdd::executeSql($query,null,null);
+        $response = \classified_ads\Bdd::executeSql($query,[],[]);
 
         return $response->fetchAll(\PDO::FETCH_ASSOC);
     }

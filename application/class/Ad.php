@@ -39,7 +39,8 @@ class Ad {
     static function viewAll(){
         $limit = 0;
         $nombre = 10; //à voir plus tard
-        $query = "SELECT `a_desc`,`a_image_url`,`a_unique_id`,`a_date_create`,`a_date_validate`, `ca_category`.`c_name` FROM `ca_ad` LEFT JOIN `ca_category` on `ca_category`.`c_id` = `a_c_id` WHERE `a_validate` = true LIMIT $limit,$nombre";
+        // $query = "SELECT `a_desc`,`a_image_url`,`a_unique_id`,`a_date_create`,`a_date_validate`, `ca_category`.`c_name` FROM `ca_ad` LEFT JOIN `ca_category` on `ca_category`.`c_id` = `a_c_id` WHERE `a_validate` = true LIMIT $limit,$nombre";
+        $query = "SELECT `a_id`,`a_image_url`,`a_title`,`a_date_create`, `a_price`, `ca_category`.`c_name` as c_name FROM `ca_ad` LEFT JOIN `ca_category` on `ca_category`.`c_id` = `a_c_id` WHERE `a_validate` = true";
         
         $response = \classified_ads\Bdd::executeSql($query,[],[]);
         return $response->fetchALL(PDO::FETCH_ASSOC);
