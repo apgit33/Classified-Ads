@@ -20,18 +20,18 @@ $router->map('GET','/', function() {
     ]);
 });
 
-// route affichage annonce id
-$router->map('GET','/view-[i:id]', function($id) {
+// // route affichage annonce id
+// $router->map('GET','/view-[i:id]', function($id) {
 
-    $twig = new \classified_ads\Twig('view.html.twig');
+//     $twig = new \classified_ads\Twig('view.html.twig');
 
-    $ad = \classified_ads\Ad::view($id);
+//     $ad = \classified_ads\Ad::view($id);
 
-    echo $twig->_template->render([
-        'ad' => $ad,
-        'SERVER_URI'=> SERVER_URI
-    ]);
-});
+//     echo $twig->_template->render([
+//         'ad' => $ad,
+//         'SERVER_URI'=> SERVER_URI
+//     ]);
+// });
 
 //route d'ajout annonce
 $router->map('GET','/add_ad', function() {
@@ -61,7 +61,7 @@ $router->map('GET','/edit-[*:slug]',function($slug) {
 
 //route form handler
 $router->map('POST','/add_form', function() {
-    require "application/treatement/form.php";
+    require dirname(dirname(__FILE__))."/application/treatement/form.php";
 });
 
 //route confirmation annonce
@@ -88,7 +88,7 @@ $router->map('GET','/delete-[*:slug]',function($slug){
 // //route confirmation annonce
 $router->map('GET','/test',function(){
     // echo "test";
-    require "application/template/home.php";
+    require dirname(dirname(__FILE__))."/application/template/home.php";
 });
 
 $match = $router->match();
@@ -96,5 +96,5 @@ $match = $router->match();
 if($match != null) {
         call_user_func_array($match['target'],$match['params']);
 } else {
-    require "application/template/404.php";
+    require dirname(dirname(__FILE__))."/application/template/404.php";
 }
