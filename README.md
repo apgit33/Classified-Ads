@@ -71,4 +71,4 @@ Projet de petites annonces
 
 ## Initialisation
 + Changer l'initialisation du Swift_SmtpTransport par celui de votre choix dans la class "Mail.php#22"
-+ Faire de même pour la clef Captcha correspondant à celle de votre api google dans "treatement/form.php#102"
++ Faire de même pour la clef Captcha correspondant à celle de votre api dans "treatement/form.php#102"
