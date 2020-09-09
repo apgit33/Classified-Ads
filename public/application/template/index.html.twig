@@ -1,0 +1,55 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    
+    <main>
+        <div class="sticky">
+
+        </div>
+        <div class="item transform fixed-bottom" id="stick">
+            <div class="container item-content">
+                <div class="row">
+                    <div class="col-8">
+                        <img src="images/arold.jpeg" alt="arold" class="item-picture">
+                    </div>
+                    <div class="col-4">
+                        <p>Adresse mail</p>
+                        <p>Nom </br> Prenom</p>
+                        <p>Téléphone</p>
+                        <p>Catégorie</p>
+                        <p>Description</p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button class="close">Fermer</button>
+            </div>
+        </div>
+        <div class="container core">
+            {% for ad in list_ads %}
+            <div class="row section">
+                <div class="col-4">
+                    <img src="{{ ad.a_image_url }}" alt="arold" class="picture">
+                </div>
+                <div class="col-6">
+                    <p>Nom </br>Prenom</p>
+                    <p>Catégorie </br>Prix</p>
+                    <button type="button" id="button" value="">Plus d'informations</i></button>
+                </div>
+                <div class="col-2">
+                    <a class="modif" uk-icon="file-edit" title="Modifier" href=></a>
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg"></svg>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+    <footer>
+
+    </footer>
+    {% endblock %}
+    {% block scriptjs %}
+        {{ parent() }}
+        
+    {% endblock %}
+    
+    
