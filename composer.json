@@ -1,7 +1,7 @@
 {
     "autoload": {
         "psr-4": {
-            "classified_ads\\": "public/application/class/"
+            "classified_ads\\": "application/class/"
         }
     },
     "require": {
