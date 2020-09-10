@@ -25,4 +25,6 @@ class Twig {
 
         $this->_template = $twig->load($name);
     }
+
+    //fonction d'index ;)
 }

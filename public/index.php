@@ -85,11 +85,10 @@ $router->map('GET','/delete-[*:slug]',function($slug){
     header("Refresh:5; url=".SERVER_URI."");
 });
 
-// //route confirmation annonce
-$router->map('GET','/test',function(){
-    // echo "test";
-    require dirname(dirname(__FILE__))."/application/template/home.php";
-});
+// $router->map('GET','/test',function(){
+//     // echo "test";
+//     require dirname(dirname(__FILE__))."/application/template/home.php";
+// });
 
 $match = $router->match();
 
