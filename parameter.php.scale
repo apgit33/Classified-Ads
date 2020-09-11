@@ -1,0 +1,15 @@
+<?php
+
+define('SMTP','smtp.exemple');
+define('PORT','port');
+define('SECURITY','ssl/tsl');
+
+define('MAIL','adrienpaturot@yahoo.fr');
+define('MAIL_USER_NAME','');
+define('MAIL_PASSWORD','Password');
+
+define('FIRST_NAME','FirstName');
+define('LAST_NAME','LastName');
+
+define('CAPTCHA_PUBLIC_KEY','YourPublicKey');
+define('CAPTCHA_PRIVATE_KEY','YourSecretKey');

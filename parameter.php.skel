@@ -1,0 +1,19 @@
+<?php
+
+//Parametre SMTP de votre boite mail
+define('SMTP','smtp.exemple');
+define('PORT','port');
+define('SECURITY','ssl/tsl');
+
+//Parametre perso de connexion au mail
+define('MAIL','adrienpaturot@yahoo.fr');
+define('MAIL_USER_NAME','Username');
+define('MAIL_PASSWORD','Password');
+
+//Nom et Prenom de l'expéditeur
+define('FIRST_NAME','FirstName');
+define('LAST_NAME','LastName');
+
+//Clef captcha
+define('CAPTCHA_PUBLIC_KEY','YourPublicKey');
+define('CAPTCHA_PRIVATE_KEY','YourSecretKey');
