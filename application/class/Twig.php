@@ -26,5 +26,38 @@ class Twig {
         $this->_template = $twig->load($name);
     }
 
-    //fonction d'index ;)
+    static function index() {
+        $twig = new \classified_ads\Twig('index.html.twig');
+
+        $ads = \classified_ads\Ad::viewAll();
+
+        echo $twig->_template->render([
+            'list_ads' => $ads,
+            'CAPTCHA_PUBLIC_KEY'=>CAPTCHA_PUBLIC_KEY,
+            'SERVER_URI'=> SERVER_URI
+        ]);
+    }
+
+    static function viewForm(){
+        $twig = new \classified_ads\Twig('form.html.twig');
+        $categories = \classified_ads\Category::getAll();
+    
+        echo $twig->_template->render([
+            'titre' => "Ajouter une annonce",
+            'list_category'=> $categories,
+            'SERVER_URI'=> SERVER_URI
+        ]);
+    }
+
+    static function editForm($slug) {
+        $twig = new \classified_ads\Twig('form.html.twig');
+        $categories = \classified_ads\Category::getAll();
+    
+        $ads = \classified_ads\Ad::getAd($slug);
+        echo $twig->_template->render([
+            'list_ads'=> $ads,
+            'list_category'=> $categories,
+            'SERVER_URI'=> SERVER_URI
+        ]);
+    }
 }
