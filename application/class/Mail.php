@@ -1,7 +1,6 @@
 <?php
 
 namespace classified_ads;
-// use Swift_Mailer;
 /**
  * Class Mail gérant l'envoi d'e-mail
  * @author Paturot A. <adrienpaturot@yahoo.fr>
@@ -19,11 +18,10 @@ class Mail {
     static function mailTo($user,$sujet,$message){
 
         // Create the Transport
-        $transport = (new \Swift_SmtpTransport('smtp.exemple', 'port','type_connection'))
-        ->setUsername('Username')
-        ->setPassword('Password')
+        $transport = (new \Swift_SmtpTransport(SMTP,PORT,SECURITY))
+        ->setUsername(MAIL_USER_NAME)
+        ->setPassword(MAIL_PASSWORD)
         ;
-
 
         // Create the Mailer using your created Transport
         $mailer = new \Swift_Mailer($transport);
@@ -33,7 +31,7 @@ class Mail {
         // Create a message
         $message = (new \Swift_Message($sujet))
         ->setContentType("text/html")
-        ->setFrom(["adrienpaturot@yahoo.fr" => 'Adrien Paturot']) //à voir plus tard
+        ->setFrom([MAIL => FIRST_NAME.LAST_NAME])
         ->setTo([$user->mail => "$user->firstName $user->lastName"])
         ->setBody($body)
         ;
