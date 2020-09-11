@@ -102,7 +102,7 @@ if ($start == '/add_form' || !empty($start)) {
     
     // //check captcha.
     // // your secret key
-    // $secret = "YourSecretKey";
+    // $secret = CAPTCHA_PRIVATE_KEY;
     // // empty response
     // $response = null;
     // // check secret key 
