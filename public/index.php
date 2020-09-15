@@ -29,22 +29,14 @@ $router->map('POST','/add_form', function() {
 
 //route confirmation annonce
 $router->map('GET','/confirm-[*:slug]',function($slug){
-    if(\classified_ads\Ad::validate($slug)){
-        echo "validate";
-    }else{
-        echo "no validate";
-    }
+    \classified_ads\Ad::validate($slug);
     header("Refresh:5; url=".SERVER_URI."");
 
 });
 
 //route suppression annonce
 $router->map('GET','/delete-[*:slug]',function($slug){
-    if(\classified_ads\Ad::delete($slug)){
-        echo "deleted";
-    }else{
-        echo "no deleted";
-    }
+    \classified_ads\Ad::delete($slug);
     header("Refresh:5; url=".SERVER_URI."");
 });
 
