@@ -23,32 +23,32 @@ if ($start == '/add_form' || !empty($start)) {
     if (v::key('mail')->validate($_POST) && v::email()->validate($_POST['mail'])) {
         $user->mail = $_POST['mail'];
     } else {
-        $erreur['mail'] = "Please verify ur email";
+        $erreur['mail'] = "Entrez un e-mail valide";
     }
     
     //check first name
     if(v::key('first_name')->validate($_POST) && v::alpha('-')->length(2,45)->validate($_POST['first_name'])){
         $user->firstName = $_POST['first_name'];
     } else {
-        $erreur['first_name'] = "Enter a valid first name";
+        $erreur['first_name'] = "Entrez un prénom valide";
     }
     
     //check last name
     if(v::key('last_name')->validate($_POST) && v::alpha('-')->validate($_POST['last_name'])){
         $user->lastName = $_POST['last_name'];
     } else {
-        $erreur['last_name'] = "Enter a valid last name";
+        $erreur['last_name'] = "Entrez un nom valide";
     }
     
     //check phone
     if(v::key('phone')->validate($_POST) && v::phone()->validate($_POST['phone'])) {
         $user->phone = $_POST['phone'];
     } else {
-        $erreur['phone'] = "Invalid phone number";
+        $erreur['phone'] = "Entrez un numéro valide";
     }
     
     if(!\classified_ads\User::checkUser($user)) {
-        $erreur['user'] = "Wrong user";
+        $erreur['user'] = "Mauvais identifiant";
     }
 
     //check price
@@ -56,7 +56,7 @@ if ($start == '/add_form' || !empty($start)) {
         if(v::key('price')->validate($_POST) && (v::numericVal()->positive()->validate($_POST['price'])) ){
             $ad->price = $_POST['price'];
         } else {
-            $erreur['price'] = "Enter a valid price";
+            $erreur['price'] = "Entrez un prix valide";
         } 
     }else{
         $ad->price = "";
@@ -67,14 +67,14 @@ if ($start == '/add_form' || !empty($start)) {
     if(v::key('category')->validate($_POST) && v::digit()->validate($_POST['category'])){
         $ad->catId = $_POST['category'];
     } else{
-        $erreur['category'] = "invalid category";
+        $erreur['category'] = "Categorie invalide";
     }
     
     //check title
     if(v::key('title')->validate($_POST) && v::notEmpty()->validate($_POST['title'])) {
         $ad->title = $_POST['title'];
     } else {
-        $erreur['title'] = "Title incorrect";
+        $erreur['title'] = "Entrez un titre valide";
     }
 
     //check image
@@ -97,7 +97,7 @@ if ($start == '/add_form' || !empty($start)) {
     if(v::key('desc')->validate($_POST) && v::notEmpty()->length(5,255)->validate($_POST['desc'])) {
         $ad->description = $_POST['desc'];
     } else {
-        $erreur['desc'] = "Enter a valid desc";
+        $erreur['desc'] = "Entrez une description valide";
     }
     
     // //check captcha.
@@ -157,15 +157,14 @@ if ($start == '/add_form' || !empty($start)) {
             \classified_ads\Ad::updateId($ad->uniqueId,hash('sha1',"$mail_crypt&$id_crypt"));
     
             //envoi mail de confirmation
-            $sujet = "Confirm your Ad : $ad->title";
-            $message = "To confirm your new ad, click on the link below <br>
-            <a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>Confirmation</a><br>
-            You can still edit your ad before post it by clicking on this link <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>Edit</a>";
+            $sujet = "Confirmez votre annonce : $ad->title";
+            $message = "Pour confirmer votre annonce, cliquez sur le lien suivant <a href = '".SERVER_URI."/confirm-$mail_crypt&$id_crypt'>Confirmation</a>.<br>
+            Vous pouvez toujours l'éditer en cliquant <a href = '".SERVER_URI."/edit-$mail_crypt&$id_crypt'>ici</a> !<br><br>".$ad->recap();
             
             if(\classified_ads\Mail::mailTo($user,$sujet,$message)) {
-                $erreur['mail'] = "An email has been send";
+                $erreur['mail'] = "Un email à été envoyé";
             }else{
-                $erreur['mail'] = "The email couldn't be send, an error occured";
+                $erreur['mail'] = "L'envoi d'email à échoué";
             }
 
         }else if(explode('-',$_SERVER['REQUEST_URI'])[0]=="/edit"){
@@ -174,5 +173,5 @@ if ($start == '/add_form' || !empty($start)) {
     }
     // json_encode($erreur);
 }else{
-    header('Location: add_ad');
+    header('Location: /add_ad');
 }

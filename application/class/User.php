@@ -1,7 +1,6 @@
 <?php
 
 namespace classified_ads;
-// use Respect\Validation\Validator as v;
 use PDO;
 
 /**
@@ -15,24 +14,6 @@ class User {
     public $firstName;
     public $lastName;
     public $phone;
-
-
-    // public function __construct($mail,$firstName,$lastName,$phone)
-    // {
-    //     $this->mail = $mail;
-    //     $this->firstName = $firstName;
-    //     $this->lastName = $lastName;
-    //     $this->phone = $phone;
-    // }
-
-    // public function checkMail(){
-    //     $query = "SELECT u_mail FROM ca_user WHERE u_mail = :mail";
-    //     if ($data = \classified_ads\Bdd::executeSql($query,[':mail'=>$mail],[':mail'=>PDO::PARAM_STR])->fetch(PDO::FETCH_ASSOC)) {
-    //         return false;
-    //     } else {
-    //         return true;
-    //     }
-    // }
     
     /**
      * Fonction permettant de vérifier si l'utilisateur est déjà dans la base
@@ -69,11 +50,6 @@ class User {
             $this->phone = $data['u_phone'];
         }
     }
-    // public function __destruct()
-    // {
-    //     //Du code à exécuter
-    // }
-
     
     static function checkUser($user){
         $query = "SELECT u_first_name,u_last_name,u_phone FROM ca_user WHERE u_mail = :mail";

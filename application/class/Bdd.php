@@ -41,7 +41,7 @@ class Bdd {
      * 
      * @return $sth - handler de la requete
      */
-    static function executeSql($query,$array,$type) {
+    static function executeSql($query,$array=[],$type=[]) {
         $co = SELF::connect();		
         $sth = $co->prepare($query);
         foreach($array as $key => &$val){

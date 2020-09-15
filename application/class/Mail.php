@@ -26,7 +26,7 @@ class Mail {
         // Create the Mailer using your created Transport
         $mailer = new \Swift_Mailer($transport);
 
-        $body = "Hello $user->firstName $user->lastName,<br><br>";
+        $body = "Bonjour $user->firstName $user->lastName,<br><br>";
         $body .= $message;
         // Create a message
         $message = (new \Swift_Message($sujet))
