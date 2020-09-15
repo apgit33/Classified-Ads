@@ -42,7 +42,7 @@ class Ad {
         // $query = "SELECT `a_desc`,`a_image_url`,`a_unique_id`,`a_date_create`,`a_date_validate`, `ca_category`.`c_name` FROM `ca_ad` LEFT JOIN `ca_category` on `ca_category`.`c_id` = `a_c_id` WHERE `a_validate` = true LIMIT $limit,$nombre";
         $query = "SELECT `a_id`,`a_image_url`,`a_title`,`a_date_create`, `a_price`, `ca_category`.`c_name` as c_name FROM `ca_ad` LEFT JOIN `ca_category` on `ca_category`.`c_id` = `a_c_id` WHERE `a_validate` = true";
         
-        $response = \classified_ads\Bdd::executeSql($query,[],[]);
+        $response = \classified_ads\Bdd::executeSql($query);
         return $response->fetchALL(PDO::FETCH_ASSOC);
     }
 
@@ -158,15 +158,15 @@ class Ad {
             
             \classified_ads\Bdd::executeSql($query,$param,$type)->fetch();
 
-            $message = "To delete your ad, click on this link <a href = '".SERVER_URI."/delete-$mail_crypt&$id_crypt'>DELETE </a>";
+            $message = "Pour supprimer votre annonce cliquez <a href = '".SERVER_URI."/delete-$mail_crypt&$id_crypt'>ici</a>";
     
-            \classified_ads\Mail::mailTo($user,"Congratulation ! Your ad $title is now validate",$message);
+            \classified_ads\Mail::mailTo($user,"Félicitation ! Votre annonce $title est maintenant publiée",$message);
 
             $return = true;
         }else{
             $return = false;
         }
-        echo ($return)? "valider":"pas valider";
+        echo ($return)? "annonce validée":"annonce pas validée";
     }
 
     /**
@@ -251,5 +251,16 @@ class Ad {
             $fpdf->Cell(40,10,"Description : ".utf8_decode($this->description));
             $this->pdf = "assets/medias/".$this->userId."/".$this->id.".pdf";
             $fpdf->Output("F",$this->pdf);
+    }
+
+    public function recap() {
+        return "
+            Voici un petit récapitulatif de votre annonce :<br>
+                Titre : $this->title<br>
+                Description : $this->description<br>
+                Catégorie : ".\classified_ads\Category::getName($this->catId)."<br>
+                Prix : $this->price<br>
+                Date de création : $this->dateCreate<br>
+            ";
     }
 }
