@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+{% block head %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,12 +12,13 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script><script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
+{% endblock %}
 
 <body>
     {% block header %}
     <header class="fixed-top">
         <nav class="navbar navbar-light bg-light ">
-            <span class="navbar-brand mb-0 h1">Lecoinsympa</span>
+            <span class="navbar-brand mb-0 h1" href="#">Lecoinsympa</span>
             <a href="add_ad">Ajouter une annonce</a>
         </nav>
 
