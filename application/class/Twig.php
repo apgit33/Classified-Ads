@@ -52,9 +52,9 @@ class Twig {
         $twig = new \classified_ads\Twig('form.html.twig');
         $categories = \classified_ads\Category::getAll();
     
-        $ads = \classified_ads\Ad::getAd($slug);
+        $ad = \classified_ads\Ad::getAd($slug);
         echo $twig->_template->render([
-            'list_ads'=> $ads,
+            'ad'=> $ad,
             'list_category'=> $categories,
             'SERVER_URI'=> SERVER_URI
         ]);

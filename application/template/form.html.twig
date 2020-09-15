@@ -46,8 +46,8 @@
                                     <select name="categorie">
                                         <option selected="selected" disabled>Selectionnez une catégorie</option>
                                         {% for categorie in list_category %}
-                                            <option value={{ categorie.c_name }}
-                                                {% if categorie.c_name is same as(produit.categorie) %}
+                                             <option value={{ categorie.c_id }} 
+                                                {% if categorie.c_id is same as(ad.a_c_id) %}
                                                     selected="selected"
                                                 {% endif %}
                                             >{{ categorie.c_name }}</option>

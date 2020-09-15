@@ -14,7 +14,7 @@ class Category {
      * @return tableau contenant les enregistrements
      */
     static function getAll() {
-        $query = "SELECT c_name FROM ca_category";
+        $query = "SELECT c_id, c_name FROM ca_category";
         $response = \classified_ads\Bdd::executeSql($query,[],[]);
 
         return $response->fetchAll(\PDO::FETCH_ASSOC);
