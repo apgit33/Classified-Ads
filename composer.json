@@ -2,7 +2,8 @@
     "autoload": {
         "psr-4": {
             "classified_ads\\": "application/class/"
-        }
+        },
+        "files": ["parameter.php.skel"]
     },
     "require": {
         "twig/twig": "3.0",
