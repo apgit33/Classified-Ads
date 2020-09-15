@@ -8,7 +8,7 @@
         </div>
         <div class="container form">
             <div class="column">
-                <form action="" id="form_product" method="POST"></form>
+                <form action="{{ SERVER_URI }}/add_form" id="form_product" method="POST"></form>
                 <div class="row"> 
                     <div class="col-6">
                         <div class="label">
@@ -45,15 +45,13 @@
                                 <div class="select is-medium is-fullwidth">
                                     <select name="categorie">
                                         <option selected="selected" disabled>Selectionnez une catégorie</option>
-                                        <option value="4">Choix 2</option>
-                                        {% for categorie in ca_category %}
-                                            <option value={{ categorie }}
-                                                {% if category.name is same as(produit.categorie) %}
+                                        {% for categorie in list_category %}
+                                            <option value={{ categorie.c_name }}
+                                                {% if categorie.c_name is same as(produit.categorie) %}
                                                     selected="selected"
                                                 {% endif %}
-                                            >{{ category.name }}</option>
+                                            >{{ categorie.c_name }}</option>
                                         {% endfor %}
-                                        <option id="cat_other" value="-1">Autre</option>
                                     </select>
                                 </div>
                             </div>
@@ -92,32 +90,7 @@
                             </div><p><strong>Note : </strong>Formats autorisés : jpg, jpeg, png. Taille maximale : 5 Mo.</p>
                             <div id="check_picture" class="verif"></div>
                         </div>
-                        <div class="label">
-                            <label for="note_file" class="label">Détails  
-                                {% if produit.manual %}
-                                    <a href={{ "medias/manuels/" ~ produit.manual ~ ".pdf" }}>{{ produit.manual }}</a>
-                                {% endif %}
-                            </label>
-                            <div id="note_file" class="file has-name is-medium">
-                                <label class="file-label">
-                                    <input type="file" class="" name="note_file">
-                                    <div class="">
-                                        <div class="file-icon">
-                                            <span class="fas fa-upload"></span>
-                                        </div>
-                                        <div class="file-label">
-                                            Choisir un fichier...
-                                        </div>
-                                    </div>
-                                    <div class="file-name">
-                                        Aucun fichier selectionné
-                                    </div>
-                                </label>
-                            </div><p><strong>Note : </strong>Format autorisé : pdf. Taille maximale : 20 Mo.</p>
-                            <div id="check_note" class="verif"></div>
-                        </div>
                     </div>
-                    
                 </div>
             </form>
             </div>

@@ -43,7 +43,6 @@ class Twig {
         $categories = \classified_ads\Category::getAll();
     
         echo $twig->_template->render([
-            'titre' => "Ajouter une annonce",
             'list_category'=> $categories,
             'SERVER_URI'=> SERVER_URI
         ]);
