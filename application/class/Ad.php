@@ -118,10 +118,11 @@ class Ad {
             $query= "DELETE FROM ca_ad WHERE a_unique_id = :uniqueId";
 
             \classified_ads\Bdd::executeSql($query,[':uniqueId'=>hash('sha1',$slug)],[':uniqueId'=>PDO::PARAM_STR]);
-            return true;
+            $return = true;
         }else{
-            return false;
+            $return = false;
         }
+        echo ($return)? "annonce supprimée":"annonce pas supprimée";
     }
 
     /**
@@ -161,10 +162,11 @@ class Ad {
     
             \classified_ads\Mail::mailTo($user,"Congratulation ! Your ad $title is now validate",$message);
 
-            return true;
+            $return = true;
         }else{
-            return false;
+            $return = false;
         }
+        echo ($return)? "valider":"pas valider";
     }
 
     /**
