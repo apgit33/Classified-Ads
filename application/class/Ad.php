@@ -255,12 +255,12 @@ class Ad {
 
     public function recap() {
         return "
-            Voici un petit récapitulatif de votre annonce :<br>
-                Titre : $this->title<br>
-                Description : $this->description<br>
-                Catégorie : ".\classified_ads\Category::getName($this->catId)."<br>
-                Prix : $this->price<br>
-                Date de création : $this->dateCreate<br>
+<pre>Voici un petit récapitulatif de votre annonce :<br>
+    Titre : $this->title<br>
+    Description : $this->description<br>
+    Catégorie : ".\classified_ads\Category::getName($this->catId)."<br>
+    Prix : $this->price<br>
+    Date de création : $this->dateCreate<br></pre>
             ";
     }
 }
