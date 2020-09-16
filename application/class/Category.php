@@ -29,7 +29,7 @@ class Category {
     static function getName($id){
         $query = "SELECT c_name FROM ca_category WHERE c_id = :id";
         $response = \classified_ads\Bdd::executeSql($query,[':id'=>$id],[':id'=>\PDO::PARAM_INT]);
-        $response->fetch(\PDO::FETCH_ASSOC);
-        return $response['c_name'];
+        $result = $response->fetch(\PDO::FETCH_ASSOC);
+        return $result['c_name'];
     }
 }
